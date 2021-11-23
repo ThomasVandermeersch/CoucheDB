@@ -1,4 +1,6 @@
 const NodeCouchDb = require('node-couchdb');
+const couch = new NodeCouchDb();
+
 const express = require("express")
 
 // const couch = new NodeCouchDb();
@@ -23,10 +25,21 @@ const couchAuth = new NodeCouchDb({
 });
 
 const app = express()
+app.set('view engine', 'pug');
+app.use(express.static('public')); //Load files from 'public' -> (CSS, image, JS...)
+
+
 
 app.get('/',function(req,res){
-    res.send('Hello World')
-    
+    couchAuth.get("dbone","_all_docs?include_docs=true").then(response=>{
+        // console.log(response)        
+        // response.data.rows.forEach(element =>{
+        //     console.log(element)
+        // })
+
+        res.render("./index.pug",{users:response.data.rows})
+    })
+ 
 })
 
 app.listen(8090)

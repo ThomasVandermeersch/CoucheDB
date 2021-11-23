@@ -1,0 +1,29 @@
+include header.pug
+
+div(class="container page")
+    h1(class="mb-0") Liste des étudiants de l'ECAM
+
+    table(class="table table-sm table-hover userTableClass")
+        thead
+            tr
+                td 
+                    b Matricule
+                td 
+                    b Nom et Prénom
+                td 
+                    b Année d'étude 
+         
+        tbdoy
+            for user in users                
+                //- tr(class="text-muted" style="cursor: not-allowed;" )
+                tr
+                    td= user.id
+                    td= user.doc.studentInfo.npetu 
+                    td= user.doc.studentInfo.annetu
+
+
+
+script.
+    function getUser(matricule){
+        window.location.href = `/admin/${matricule}`
+    }
