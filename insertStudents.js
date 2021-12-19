@@ -2,12 +2,15 @@
 const NodeCouchDb = require('node-couchdb');
 const fs = require('fs');
 
-
-const couchAuth = new NodeCouchDb({
-    auth: {
-        user: 'admin',
-        pass: 'admin'
-    }
+const couchExternal = new NodeCouchDb({
+  host: 'localhost',
+  timeout : 10000,
+  protocol: 'http',
+  port: 5984,
+  auth: {
+    user: 'admin',
+    pass: 'admin'
+  }
 });
 
 fs.readFile('./students.json', 'utf-8', (err, data) => {
@@ -15,6 +18,6 @@ fs.readFile('./students.json', 'utf-8', (err, data) => {
   students = JSON.parse(data)
   
   students.forEach(student =>{
-    couchAuth.insert("dbone", {_id : student.matetu, studentInfo:student})
+    couchExternal.insert("students", {_id : student.matetu, annee : student.annetu, nom : student.npetu})
   })
 });

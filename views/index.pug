@@ -1,7 +1,15 @@
 include header.pug
 
 div(class="container page")
-    h1(class="mb-0") Liste des étudiants de l'ECAM
+    h1(class="mb-0")= "Liste des étudiants de l'ECAM (" + nbDB + ')'
+
+    h2 Ajouter un utilisateur
+    form(method="POST", action="/addStudent")
+        input(type='number', name="_id" placeholder= 'Entrez le matricule')
+        input(type='text' ,name='nom' placeholder='Entrez le nom')
+        input(type='text' ,name='annee' placeholder="Entrez l'année d'étude")
+
+        button(type='submit') Confirmer 
 
     table(class="table table-sm table-hover userTableClass")
         thead
@@ -18,8 +26,8 @@ div(class="container page")
                 //- tr(class="text-muted" style="cursor: not-allowed;" )
                 tr
                     td= user.id
-                    td= user.doc.studentInfo.npetu 
-                    td= user.doc.studentInfo.annetu
+                    td= user.doc.nom 
+                    td= user.doc.annee
 
 
 

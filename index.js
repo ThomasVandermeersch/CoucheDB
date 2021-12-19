@@ -1,45 +1,53 @@
 const NodeCouchDb = require('node-couchdb');
-const couch = new NodeCouchDb();
+var bodyParser = require('body-parser')
 
 const express = require("express")
+const delay = require('delay')
+var connectTodbOne = true
 
-// const couch = new NodeCouchDb();
-// const MemcacheNode = require('node-couchdb-plugin-memcached');
-// const couchWithMemcache = new NodeCouchDb({
-//     cache: new MemcacheNode
-// });
 
-// node-couchdb instance talking to external service
-const couchExternal = new NodeCouchDb({
-    host: 'couchdb.external.service',
-    protocol: 'https',
-    port: 5984
-});
- 
-// not admin party
-const couchAuth = new NodeCouchDb({
+const couchAuthOne = new NodeCouchDb({
     auth: {
         user: 'admin',
         pass: 'admin'
     }
 });
 
+const couchAuthTwo = new NodeCouchDb({
+    host: 'localhost',
+    timeout : 10000,
+    protocol: 'http',
+    port: 5984,
+    auth: {
+      user: 'admin',
+      pass: 'admin'
+    }
+  });
+
 const app = express()
 app.set('view engine', 'pug');
 app.use(express.static('public')); //Load files from 'public' -> (CSS, image, JS...)
-
-
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/',function(req,res){
-    couchAuth.get("dbone","_all_docs?include_docs=true").then(response=>{
-        // console.log(response)        
-        // response.data.rows.forEach(element =>{
-        //     console.log(element)
-        // })
+    if(connectTodbOne){
+        couchAuthOne.get("students","_all_docs?include_docs=true").then(response=>{
+            res.render("./index.pug",{users:response.data.rows,nbDB:0})
+        })
+        connectTodbOne = false
+    }
+    else{
+        couchAuthTwo.get("students","_all_docs?include_docs=true").then(response=>{
+            res.render("./index.pug",{users:response.data.rows, nbDB:1})
+        })
+        connectTodbOne = true
+    }
+})
 
-        res.render("./index.pug",{users:response.data.rows})
-    })
- 
+app.post("/addStudent", async (req,res)=>{
+    await couchAuthOne.insert("students", req.body)
+    await delay(3000)
+    res.redirect('/')
 })
 
 app.listen(8090)
